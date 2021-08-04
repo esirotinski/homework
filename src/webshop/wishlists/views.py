@@ -32,7 +32,7 @@ class WishlistsViewSet(viewsets.ViewSet):
         else:
             return Response(serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST)
-21
+
     def update(self, request, pk=None):
         wishlist = get_object_or_404(self.queryset, pk=pk)
         serializer = WishlistDetailsSerializer(data=request.data)
