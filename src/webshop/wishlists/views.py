@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from wishlists.permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
 from wishlists.models import Wishlist
@@ -8,7 +9,7 @@ from wishlists.serializers import WishlistDetailsSerializer
 
 
 class WishlistsViewSet(viewsets.ViewSet):
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly, )
     queryset = Wishlist.objects.all()
 
     def list(self, request):
