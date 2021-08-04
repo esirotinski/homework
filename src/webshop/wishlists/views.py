@@ -2,7 +2,7 @@ from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from wishlists.permissions import IsOwnerOrReadOnly, IsOwnerOnly
+from webshop.permissions import IsOwnerOnly
 from rest_framework.response import Response
 from rest_framework import status
 from wishlists.models import Wishlist
