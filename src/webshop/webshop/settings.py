@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
     'drf_yasg',
     'products.apps.ProductsConfig',
     'wishlists.apps.WishlistsConfig',
