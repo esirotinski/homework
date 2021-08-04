@@ -1,10 +1,10 @@
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
-from webshop.permissions import IsOwnerOnly
 from rest_framework.response import Response
-from rest_framework import status
+from webshop.permissions import IsOwnerOnly
+
 from wishlists.models import Wishlist
 from wishlists.serializers import WishlistDetailsSerializer
 
@@ -27,42 +27,34 @@ class WishlistsViewSet(viewsets.ViewSet):
 
     def create(self, request):
         serializer = WishlistDetailsSerializer(data=request.data)
-
         if serializer.is_valid():
-            # name = serializer.data.get('name')
-            # owner = serializer.data.get('owner')
-            # products = serializer.data.get('products')
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
         wishlist = get_object_or_404(self.queryset, pk=pk)
-        serializer = WishlistDetailsSerializer(data=request.data)
-        # print(f"{wishlist.id = }")
-
+        serializer = WishlistDetailsSerializer(wishlist, data=request.data)
         if serializer.is_valid():
-            # wishlist.name = serializer.data.get('name')
-            # wishlist.owner = serializer.data.get('owner')
-            # wishlist.products = serializer.data.get('products')
-            # wishlist.save()
-            serializer.update(wishlist, serializer.data)
-            # wishlist.update(serializer.data)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
-        pass
+        wishlist = get_object_or_404(self.queryset, pk=pk)
+        serializer = WishlistDetailsSerializer(wishlist, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         wishlist = get_object_or_404(self.queryset, pk=pk)
         wishlist.delete()
-        # response_data = {"detail": "Item deleted."}
         return Response(
-            # data = response_data,
-            status=status.HTTP_204_NO_CONTENT
+            data = {"detail": "Wishlist deleted."},
+            status=status.HTTP_200_OK
             )
