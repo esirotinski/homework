@@ -1,7 +1,8 @@
+from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from wishlists.permissions import IsOwnerOrReadOnly
+from wishlists.permissions import IsOwnerOrReadOnly, IsOwnerOnly
 from rest_framework.response import Response
 from rest_framework import status
 from wishlists.models import Wishlist
@@ -9,15 +10,18 @@ from wishlists.serializers import WishlistDetailsSerializer
 
 
 class WishlistsViewSet(viewsets.ViewSet):
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly, )
+    permission_classes = (IsAuthenticated, IsOwnerOnly)
     queryset = Wishlist.objects.all()
 
+    def get_queryset(self):
+        return self.queryset.filter(owner=self.request.user)
+
     def list(self, request):
-        serializer_class = WishlistDetailsSerializer(self.queryset, many=True)
+        serializer_class = WishlistDetailsSerializer(self.get_queryset(), many=True)
         return Response(serializer_class.data)
 
     def retrieve(self, request, pk=None):
-        wishlist = get_object_or_404(self.queryset, pk=pk)
+        wishlist = get_object_or_404(self.get_queryset(), pk=pk)
         serializer_class = WishlistDetailsSerializer(wishlist)
         return Response(serializer_class.data)
 
@@ -57,8 +61,8 @@ class WishlistsViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         wishlist = get_object_or_404(self.queryset, pk=pk)
         wishlist.delete()
-        response_data = {"detail": "Item deleted."}
+        # response_data = {"detail": "Item deleted."}
         return Response(
-            data = response_data,
+            # data = response_data,
             status=status.HTTP_204_NO_CONTENT
             )
