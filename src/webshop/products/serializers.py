@@ -4,6 +4,10 @@ from products.models import Product
 
 
 class ProductsDetailsSerializer(serializers.ModelSerializer):
+    wished_counter = serializers.ReadOnlyField()
+
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ('wished_counter', 'sku', 'name', 'price')
+
+

@@ -12,6 +12,13 @@ class ProductsViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = Product.objects.all()
 
+    # raw_sql =  """
+    # SELECT COUNT(DISTINCT wishlists_wishlist.owner_id) \
+    #     FROM wishlists_wishlist \
+    #     INNER JOIN wishlists_wishlist_products \
+    #     ON wishlists_wishlist.id=wishlists_wishlist_products.id \
+    #     WHERE wishlists_wishlist_products.product_id=883;"""
+
     def list(self, request):
         serializer_class = ProductsDetailsSerializer(self.queryset, many=True)
         return Response(serializer_class.data)
