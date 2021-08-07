@@ -6,7 +6,10 @@ from products.models import Product
 User = get_user_model()
 
 class Wishlist(models.Model):
-    name = models.CharField(max_length=64, blank=False, null=False)
+    name = models.CharField(
+        max_length=64,
+        blank=False,
+        null=False)
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

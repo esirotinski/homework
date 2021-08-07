@@ -10,6 +10,14 @@ class ProductsViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = Product.objects.all()
 
+    def create(self, request):
+        serializer = ProductsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def list(self, request):
         serializer_class = ProductsSerializer(self.queryset, many=True)
         return Response(serializer_class.data)
@@ -32,14 +40,6 @@ class ProductsViewSet(viewsets.ViewSet):
 
         serializer_class = ProductRetrieveSerializer(product)
         return Response(serializer_class.data)
-
-    def create(self, request):
-        serializer = ProductsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
         product = get_object_or_404(self.queryset, pk=pk)
@@ -64,6 +64,4 @@ class ProductsViewSet(viewsets.ViewSet):
         product.delete()
         return Response(
             data = {"detail": "Product deleted."},
-            status=status.HTTP_200_OK
-            )
-
+            status=status.HTTP_200_OK)
