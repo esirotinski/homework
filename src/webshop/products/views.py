@@ -1,35 +1,40 @@
-from re import S
-from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 
 from products.models import Product
-from products.serializers import ProductsDetailsSerializer
+from products.serializers import ProductsSerializer, ProductRetrieveSerializer
 
 class ProductsViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = Product.objects.all()
 
-    # raw_sql =  """
-    # SELECT COUNT(DISTINCT wishlists_wishlist.owner_id) \
-    #     FROM wishlists_wishlist \
-    #     INNER JOIN wishlists_wishlist_products \
-    #     ON wishlists_wishlist.id=wishlists_wishlist_products.id \
-    #     WHERE wishlists_wishlist_products.product_id=883;"""
-
     def list(self, request):
-        serializer_class = ProductsDetailsSerializer(self.queryset, many=True)
+        serializer_class = ProductsSerializer(self.queryset, many=True)
         return Response(serializer_class.data)
 
     def retrieve(self, request, pk=None):
         product = get_object_or_404(self.queryset, pk=pk)
-        serializer_class = ProductsDetailsSerializer(product)
+
+        sql_query = Product.objects.raw(f"""
+            SELECT sku as sku,
+            (SELECT COUNT(DISTINCT wishlists_wishlist.owner_id)
+            FROM wishlists_wishlist
+            INNER JOIN wishlists_wishlist_products
+            ON wishlists_wishlist.id=wishlists_wishlist_products.id
+            WHERE wishlists_wishlist_products.product_id=sku)
+            AS uniq_users_who_wished_this_product
+            FROM products_product where sku={pk}
+        """)
+        product.uniq_users_who_wished_this_product = \
+            sql_query[0].uniq_users_who_wished_this_product
+
+        serializer_class = ProductRetrieveSerializer(product)
         return Response(serializer_class.data)
 
     def create(self, request):
-        serializer = ProductsDetailsSerializer(data=request.data)
+        serializer = ProductsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -38,7 +43,7 @@ class ProductsViewSet(viewsets.ViewSet):
 
     def update(self, request, pk=None):
         product = get_object_or_404(self.queryset, pk=pk)
-        serializer = ProductsDetailsSerializer(product, data=request.data)
+        serializer = ProductsSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -47,7 +52,7 @@ class ProductsViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         product = get_object_or_404(self.queryset, pk=pk)
-        serializer = ProductsDetailsSerializer(product, data=request.data, partial=True)
+        serializer = ProductsSerializer(product, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

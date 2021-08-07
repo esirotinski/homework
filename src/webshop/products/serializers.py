@@ -1,13 +1,15 @@
-from django.db import models
 from rest_framework import serializers
 from products.models import Product
 
 
-class ProductsDetailsSerializer(serializers.ModelSerializer):
-    wished_counter = serializers.ReadOnlyField()
-
+class ProductRetrieveSerializer(serializers.ModelSerializer):
+    uniq_users_who_wished_this_product = serializers.IntegerField(default=0)
     class Meta:
         model = Product
-        fields = ('wished_counter', 'sku', 'name', 'price')
+        fields = ('sku', 'name', 'price', 'uniq_users_who_wished_this_product')
 
 
+class ProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('sku', 'name', 'price')
