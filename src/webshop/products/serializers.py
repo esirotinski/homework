@@ -6,10 +6,10 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
     uniq_users_who_wished_this_product = serializers.IntegerField()
     class Meta:
         model = Product
-        fields = ('sku', 'name', 'price', 'uniq_users_who_wished_this_product')
+        fields = '__all__'
 
 
 class ProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('sku', 'name', 'price')
+        fields = '__all__'

@@ -19,7 +19,7 @@ class Product(models.Model):
         decimal_places=2,
         blank=False,
         null=False)
-    description = models.TextField(
+    description = models.CharField(
         max_length=512,
         blank=True,
         null=True)
