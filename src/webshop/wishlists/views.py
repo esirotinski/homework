@@ -19,7 +19,7 @@ class WishlistsViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = WishlistsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -29,65 +29,97 @@ class WishlistsViewSet(viewsets.ViewSet):
         return Response(serializer_class.data)
 
     def retrieve(self, request, pk=None):
-        wishlist = get_object_or_404(self.get_queryset(), pk=pk)
-        serializer_class = WishlistsSerializer(wishlist)
-        return Response(serializer_class.data)
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            serializer_class = WishlistsSerializer(wishlist)
+        except Exception as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer_class.data)
 
     def update(self, request, pk=None):
-        wishlist = get_object_or_404(self.queryset, pk=pk)
-        serializer = WishlistsSerializer(wishlist, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            serializer = WishlistsSerializer(wishlist, data=request.data)
+        except Exception as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
-        wishlist = get_object_or_404(self.queryset, pk=pk)
-        serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Exception as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        wishlist = get_object_or_404(self.queryset, pk=pk)
-        wishlist.delete()
-        return Response(data = {"detail": "Wishlist deleted."}, status=status.HTTP_200_OK)
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            wishlist.delete()
+        except Exception as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(data = {"detail": "Wishlist deleted."}, status=status.HTTP_200_OK)
 
     @action(methods=['patch'], detail=True)
     def add_product(self, request, pk=None):
         """
         Adds a `Product` to the wishlist.
-        """
-        wishlist = get_object_or_404(self.queryset, pk=pk)
-        serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
-        if serializer.is_valid():
-            try:
-                product_id = request.data['product']
-                wishlist.products.add(product_id)
-            except Exception:
-                return Response(
-                    data={"detail": f"Invalid pk \"{product_id}\" - object does not exist."}, 
-                    status=status.HTTP_400_BAD_REQUEST)
+        """ 
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Exception as e:
+            return Response(data={'detail': str(e)})
+        else:
+            if serializer.is_valid() and request.data != {}:
+                try:
+                    prod_id = request.data['product']
+                    wishlist.products.add(prod_id)
+                except Exception:
+                    return Response(
+                        data="{'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}",
+                        status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(
+                    data="{'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}",
+                    status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['patch'], detail=True)
     def remove_product(self, request, pk=None):
         """
         Removes a `Product` from the wishlist.
         """
-        wishlist = get_object_or_404(self.queryset, pk=pk)
-        serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
-        if serializer.is_valid():
-            try:
-                product_id = request.data['product']
-                wishlist.products.remove(product_id)
-            except Exception:
-                return Response(
-                    data={"detail": f"Invalid pk \"{product_id}\" - object does not exist."}, 
-                    status=status.HTTP_400_BAD_REQUEST)
+        try:
+            wishlist = get_object_or_404(self.get_queryset(), pk=pk)
+            serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Exception as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if serializer.is_valid() and request.data != {}:
+                try:
+                    prod_id = request.data['product']
+                    wishlist.products.remove(prod_id)
+                except Exception:
+                    return Response(
+                        data="{'detail':'Unexpected data. JSON should contain `product` with `id`.'}",
+                        status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(
+                    data="{'detail':'Unexpected data. JSON should contain `product` with `id`.'}",
+                    status=status.HTTP_400_BAD_REQUEST)
