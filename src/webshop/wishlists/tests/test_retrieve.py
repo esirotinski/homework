@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 
-class WishlistListTestCase(APITestCase):
+class WishlistRetrieveTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -31,12 +31,16 @@ class WishlistListTestCase(APITestCase):
         response = self.client.post(path='/api/v1/wishlists/', data=request_json)
         self.wishlist_id = response.json()['id']
 
-    def test_wishlist_list_by_id_unauthenticated_fails(self):
+    def test_wishlist_retrieve_passes(self):
+        response = self.client.get(path=f'/api/v1/wishlists/{self.wishlist_id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_wishlist_retrieve_unauthenticated_fails(self):
         self.client.force_authenticate(user=None)
         response = self.client.get(path=f'/api/v1/wishlists/{self.wishlist_id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_wishlist_list_by_id_authenticated_another_user_fails(self):
+    def test_wishlist_retrieve_authenticated_another_user_fails(self):
         self.client.force_authenticate(user=self.user2, token=self.token2)
         response = self.client.get(path=f'/api/v1/wishlists/{self.wishlist_id}/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
