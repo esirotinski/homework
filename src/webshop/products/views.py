@@ -1,3 +1,4 @@
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -25,6 +26,8 @@ class ProductsViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         try:
             product = get_object_or_404(self.queryset, pk=pk)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -57,6 +60,8 @@ class ProductsViewSet(viewsets.ViewSet):
         try:
             product = get_object_or_404(self.queryset, pk=pk)
             serializer = ProductsSerializer(product, data=request.data)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -70,6 +75,8 @@ class ProductsViewSet(viewsets.ViewSet):
         try:
             product = get_object_or_404(self.queryset, pk=pk)
             serializer = ProductsSerializer(product, data=request.data, partial=True)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -83,6 +90,8 @@ class ProductsViewSet(viewsets.ViewSet):
         try:
             product = get_object_or_404(self.queryset, pk=pk)
             product.delete()
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:

@@ -1,3 +1,4 @@
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -32,6 +33,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             serializer_class = WishlistsSerializer(wishlist)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -41,6 +44,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             serializer = WishlistsSerializer(wishlist, data=request.data)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -54,6 +59,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -67,6 +74,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             wishlist.delete()
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -80,6 +89,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)})
         else:
@@ -106,6 +117,8 @@ class WishlistsViewSet(viewsets.ViewSet):
         try:
             wishlist = get_object_or_404(self.get_queryset(), pk=pk)
             serializer = WishlistsSerializer(wishlist, data=request.data, partial=True)
+        except Http404 as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
