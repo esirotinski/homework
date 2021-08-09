@@ -29,4 +29,4 @@ class ProductDeleteTestCase(APITestCase):
     def test_product_delete_fails(self):
         response = self.client.delete(path=f'/api/v1/products/102/')
         self.assertEqual(response.data['detail'], 'No Product matches the given query.')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
