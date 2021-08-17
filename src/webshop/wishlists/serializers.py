@@ -11,10 +11,13 @@ class WishlistsSerializer(serializers.ModelSerializer):
         model = Wishlist
         fields = '__all__'
 
+    def create(self, validated_data):
+        validated_data['owner'] = self.context['request'].user
+        return super().create(validated_data)
+
 
 class WishlistsAddProductSerializer(serializers.Serializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), required=True)
 
     class Meta:
         fields = ('product', )
-        # fields = '__all__'

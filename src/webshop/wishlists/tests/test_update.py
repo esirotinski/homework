@@ -23,7 +23,8 @@ class WishlistUpdateTestCase(APITestCase):
 
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        
+        # self.client.force_authenticate(self.user)
+
     def create_wishlist(self):
         request_json = {'name': 'Birthday Wishlist', 'products':[self.sku]}
         response = self.client.post(path='/api/v1/wishlists/', data=request_json)

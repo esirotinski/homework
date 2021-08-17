@@ -31,10 +31,9 @@ class WishlistDeleteTestCase(APITestCase):
     
     def test_wishlist_delete_passes(self):
         response = self.client.delete(path=f"/api/v1/wishlists/{self.wishlist_id}/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['detail'], 'Wishlist deleted.')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_wishlist_delete_fails(self):
         response = self.client.delete(path=f'/api/v1/wishlists/102/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.json()['detail'], 'No Wishlist matches the given query.')
+        self.assertEqual(response.json()['detail'], 'Not found.')

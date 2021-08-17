@@ -38,7 +38,7 @@ class WishlistRemoveProductTestCase(APITestCase):
         self.assertEqual(response.json()['products'], [self.sku])
     
     def test_wishlist_remove_product_fails(self):
-        request_json = {'products':[101]}
+        request_json = {'products': [101]}
         response = self.client.patch(path=f'/api/v1/wishlists/{self.wishlist_id}/remove_product/', data=request_json)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # TODO: Fix code here: 
