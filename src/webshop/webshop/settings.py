@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'drf_yasg',
-    'products.apps.ProductsConfig',
-    'wishlists.apps.WishlistsConfig',
+    'products',
+    'wishlists',
 ]
 
 REST_FRAMEWORK = {

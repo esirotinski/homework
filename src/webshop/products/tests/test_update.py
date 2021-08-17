@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from products.models import Product
 
+
 class ProductCreateTestCase(APITestCase):
 
     @classmethod

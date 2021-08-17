@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from products.models import Product
 
+
 class ProductDeleteTestCase(APITestCase):
 
     @classmethod

@@ -5,6 +5,7 @@ from products.models import Product
 
 User = get_user_model()
 
+
 class Wishlist(models.Model):
     name = models.CharField(
         max_length=64,
