@@ -1,0 +1,11 @@
+[user]
+	name = Eugene Sirotinski
+	email = esirotinski@gmail.com
+[core]
+	excludesfile = ~/.gitignore
+[alias]
+	co = checkout
+	br = branch
+	st = status
+	unstage = reset HEAD --
+	last = log -1 HEAD
