@@ -33,11 +33,11 @@ class ProductDeleteTestCase(APITestCase):
 
     def test_product_retrieve_bad_sku_fails(self):
         response = self.client.get(path=f'/api/v1/products/101/')
-        self.assertEqual(response.json()['detail'], 'No Product matches the given query.')
+        self.assertEqual(response.json()['detail'], 'Not found.')
 
     def test_product_retrieve_sku_chars_fails(self):
         response = self.client.get(path=f'/api/v1/products/abc/')
-        self.assertEqual(response.json()['detail'], "Field 'sku' expected a number but got 'abc'.")
+        self.assertEqual(response.json()['detail'], "Not found.")
 
     def test_product_retrieve_unauthenticated_fails(self):
         self.client.force_authenticate(user=None)

@@ -1,5 +1,3 @@
-from django.db import router
-from rest_framework import urlpatterns
 from products.views import ProductsViewSet
 from rest_framework.routers import DefaultRouter
 

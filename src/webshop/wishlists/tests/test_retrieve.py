@@ -2,7 +2,6 @@ import random
 
 from django.contrib.auth.models import User
 from products.models import Product
-from wishlists.models import Wishlist
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
