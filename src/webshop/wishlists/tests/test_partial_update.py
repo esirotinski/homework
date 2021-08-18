@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from products.models import Product
+from wishlists.models import Wishlist
 
 
 class WishlistPartialUpdateTestCase(APITestCase):
@@ -25,9 +26,9 @@ class WishlistPartialUpdateTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         
     def create_wishlist(self):
-        request_json = {'name': 'Birthday Wishlist', 'products':[self.sku]}
-        response = self.client.post(path='/api/v1/wishlists/', data=request_json)
-        self.wishlist_id = response.json()['id']
+        wishlist = Wishlist.objects.create(name='Birthday Wishlist', owner=self.user)
+        wishlist.products.add(self.sku)
+        self.wishlist_id = wishlist.id
     
     def test_wishlist_partial_update_passes(self):
         request_json = {'name': 'New Wishlist'}

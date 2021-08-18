@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from products.models import Product
+from wishlists.models import Wishlist
 
 
 class WishlistRemoveProductTestCase(APITestCase):
@@ -27,9 +28,9 @@ class WishlistRemoveProductTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         
     def create_wishlist(self):
-        request_json = {'name': 'Birthday Wishlist', 'products':[self.sku, self.sku2]}
-        response = self.client.post(path='/api/v1/wishlists/', data=request_json)
-        self.wishlist_id = response.json()['id']
+        wishlist = Wishlist.objects.create(name='Birthday Wishlist', owner=self.user)
+        wishlist.products.add(self.sku)
+        self.wishlist_id = wishlist.id
     
     def test_wishlist_remove_product_passes(self):
         request_json = {'product': f'{self.sku2}'}

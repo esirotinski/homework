@@ -16,7 +16,6 @@ class WishlistCreateTestCase(APITestCase):
         cls.product1 = Product.objects.create(sku=random.getrandbits(32), name="name1", price=22.05)
         cls.product2 = Product.objects.create(sku=random.getrandbits(32), name="name2", price=42.05)
 
-
     def setUp(self):
         self.api_authentication()
 
@@ -24,7 +23,7 @@ class WishlistCreateTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
     def test_wishlist_create_passes(self):
-        request_json = {'name': 'Birthday Wishlist', 'products':[self.product2.sku, self.product1.sku]}
+        request_json = {'name': 'Birthday Wishlist', 'products': [self.product2.sku, self.product1.sku]}
         response = self.client.post(path='/api/v1/wishlists/', data=request_json)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json()['name'], request_json['name'])

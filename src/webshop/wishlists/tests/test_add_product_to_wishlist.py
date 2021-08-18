@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from products.models import Product
+from wishlists.models import Wishlist
 
 
 class WishlistAddProductTestCase(APITestCase):
@@ -27,34 +28,18 @@ class WishlistAddProductTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         
     def create_wishlist(self):
-        request_json = {'name': 'Birthday Wishlist', 'products':[self.sku]}
-        response = self.client.post(path='/api/v1/wishlists/', data=request_json)
-        self.wishlist_id = response.json()['id']
-    
+        wishlist = Wishlist.objects.create(name='Birthday Wishlist', owner=self.user)
+        wishlist.products.add(self.sku)
+        self.wishlist_id = wishlist.id
+
     def test_wishlist_add_product_passes(self):
         request_json = {'product': f'{self.sku2}'}
         response = self.client.patch(path=f'/api/v1/wishlists/{self.wishlist_id}/add_product/', data=request_json)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # TODO: Run the asserContains, at the moment they fail.
-        # print(response.json()['products'])
-        # self.assertContains(response.json()['products'], self.sku)
-        # self.assertContains(response.json()['products'], self.sku2)
+        self.assertContains(response, self.sku, status_code=status.HTTP_200_OK)
+        self.assertContains(response, self.sku2, status_code=status.HTTP_200_OK)
     
     def test_wishlist_add_product_fails(self):
-        request_json = {'products':[101]}
+        request_json = {'products': [101]}
         response = self.client.patch(path=f'/api/v1/wishlists/{self.wishlist_id}/add_product/', data=request_json)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        # TODO: Fix code here:
-        # Traceback (most recent call last):
-        #   File "/home/sh/git/homework/src/webshop/wishlists/tests/test_remove_product_from_wishlist.py", line 44, in test_wishlist_remove_product_fails
-        #     print(response.json()['detail'])
-        # TypeError: string indices must be integers
-
-        # self.assertEqual(response.json()[0], "{'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}")
-        #
-        # Traceback (most recent call last):
-        #   File "/home/sh/git/homework/src/webshop/wishlists/tests/test_add_product_to_wishlist.py", line 48, in test_wishlist_add_product_fails
-        #     self.assertEqual(response.json()[0], "{'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}")
-        # AssertionError: '{' != "{'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}"
-        # - {
-        # + {'detail':'Unexpected data. JSON should contain `product` with valid `id`.'}
+        self.assertEqual(response.json()['product'], ['This field is required.'])
