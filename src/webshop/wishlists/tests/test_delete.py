@@ -18,6 +18,7 @@ class WishlistDeleteTestCase(APITestCase):
         cls.product = Product.objects.create(sku=cls.sku, name='Digital Watch', price=455.99)
         cls.wishlist = Wishlist.objects.create(name='Birthday Wishlist', owner=cls.user)
         cls.wishlist.products.add(cls.sku)
+        # print('setUpTestData', cls.wishlist.id)
         # cls.wishlist_id = 0
 
     def setUp(self):
@@ -33,15 +34,16 @@ class WishlistDeleteTestCase(APITestCase):
     #     self.wishlist_id = wishlist.id
     
     def test_wishlist_delete_passes(self):
-        print(self.wishlist.id)
+        # print(self.wishlist.id)
         response = self.client.delete(path=f"/api/v1/wishlists/{self.wishlist.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    # TODO: Find out why this one fails:
-    # def test_wishlist_deleted_fails(self):
-    #     print(self.wishlist.id)
-    #     response = self.client.delete(path=f"/api/v1/wishlists/{self.wishlist.id}/")
-    #     self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    # TODO: Find out why this one fails:~
+    def test_wishlist_deleted_fails(self):
+        # print(self.wishlist.id)
+        self.wishlist.delete()
+        response = self.client.delete(path=f"/api/v1/wishlists/{self.wishlist.id}/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_wishlist_delete_fails(self):
         response = self.client.delete(path=f'/api/v1/wishlists/102/')
